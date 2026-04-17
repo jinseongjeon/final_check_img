@@ -610,12 +610,12 @@
         </div>
 
         <!-- 체크리스트 파일 -->
-        <div class="ai-file-row">
+        <div class="ai-file-row" id="aiFileDropZone" style="border: 2px dashed var(--border2); padding: 16px; border-radius: var(--radius-sm); transition: all 0.2s;">
           <label class="ai-file-label" for="aiRefFile">
-            📎 체크리스트 파일 체택
+            📎 체크리스트 첨부 (클릭 또는 드래그)
           </label>
           <input type="file" id="aiRefFile" accept=".txt,.json,.csv,.md" style="display:none" />
-          <span class="ai-file-name" id="aiFileName">선택된 파일 없음</span>
+          <span class="ai-file-name" id="aiFileName">선택된 파일 없음 (.txt, .json 등)</span>
           <button class="ai-file-clear" id="aiFileClear" title="파일 해제">✕</button>
         </div>
 
@@ -1200,13 +1200,45 @@ function resetAll() {
    ============================================= */
 let aiRefFileData = null; // { name, content }
 
-// 파일 선택
-document.getElementById('aiRefFile').addEventListener('change', async e => {
-  const f = e.target.files[0];
+async function handleAiFileSelect(f) {
   if (!f) return;
   const text = await f.text();
   aiRefFileData = { name: f.name, content: text };
   document.getElementById('aiFileName').textContent = f.name;
+}
+
+// 파일 선택 (클릭)
+document.getElementById('aiRefFile').addEventListener('change', e => {
+  handleAiFileSelect(e.target.files[0]);
+});
+
+// 파일 선택 (드래그앤드랍)
+const aiFileDropZone = document.getElementById('aiFileDropZone');
+aiFileDropZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  aiFileDropZone.style.borderColor = 'var(--accent)';
+  aiFileDropZone.style.backgroundColor = 'rgba(108,99,255,0.05)';
+});
+aiFileDropZone.addEventListener('dragleave', e => {
+  e.preventDefault();
+  aiFileDropZone.style.borderColor = 'var(--border2)';
+  aiFileDropZone.style.backgroundColor = 'transparent';
+});
+aiFileDropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  aiFileDropZone.style.borderColor = 'var(--border2)';
+  aiFileDropZone.style.backgroundColor = 'transparent';
+  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    const f = e.dataTransfer.files[0];
+    const ext = f.name.split('.').pop().toLowerCase();
+    if (['txt', 'json', 'csv', 'md'].includes(ext)) {
+      handleAiFileSelect(f);
+      // 브라우저 파일 input의 값을 리셋하여 동일한 파일 다시 올릴 수 있게 지원
+      document.getElementById('aiRefFile').value = '';
+    } else {
+      alert('txt, json, csv, md 파일만 지원합니다.');
+    }
+  }
 });
 
 // 파일 해제
