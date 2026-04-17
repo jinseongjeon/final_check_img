@@ -1,11 +1,7 @@
 /**
  * Vercel Serverless Function — Gemini API 프록시
- *
- * 역할: 브라우저에서 받은 요청을 Gemini API로 전달하고 응답을 반환.
- *       API 키는 Vercel 환경변수(GEMINI_API_KEY)에서만 읽으므로
- *       클라이언트에 노출되지 않습니다.
  */
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS 헤더 (같은 Vercel 도메인이면 불필요하지만 로컬 개발용으로 추가)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
