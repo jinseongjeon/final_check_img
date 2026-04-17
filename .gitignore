@@ -1,1 +1,8 @@
+# 로컬 전용 설정 (API 키 포함)
 config.js
+
+# Vercel
+.vercel
+
+# Node
+node_modules

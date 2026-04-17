@@ -9,8 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <!-- config.js: API 키 설정 파일 (없어도 정상 작동, 수동 입력 모드로 fallback) -->
-  <script src="config.js" onerror="window.__configMissing=true"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -603,30 +601,13 @@
       </div>
 
       <div class="card">
-        <!-- API 키 + 모델 -->
-        <div class="ai-config" id="aiConfigRow">
-          <div class="ai-config-item">
-            <label class="ai-label" for="aiApiKey">🔑 Gemini API Key</label>
-            <input type="password" id="aiApiKey" class="ai-input"
-              placeholder="AIza... 또는 AQ... API 키를 입력하세요" />
-          </div>
-          <div class="ai-config-item">
-            <label class="ai-label" for="aiModel">🤖 모델</label>
-            <input type="text" id="aiModel" class="ai-input"
-              value="gemini-2.5-flash-preview-04-17" placeholder="gemini-2.0-flash" />
-          </div>
-        </div>
-        <!-- config.js 로드 시 자동적용 안내 -->
-        <div id="aiConfigLoaded" style="display:none;margin-bottom:14px">
+        <!-- 서버 연결 상태 표시 -->
+        <div style="margin-bottom:14px">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             <span style="background:rgba(52,211,153,0.12);color:var(--green);border:1px solid rgba(52,211,153,0.25);border-radius:5px;padding:4px 12px;font-size:12px;font-weight:600">
-              ✅ API Key config.js로 자동 적용됨
+              🔒 API Key 서버에서 관리됨
             </span>
-            <span id="aiConfigModelLabel" style="font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace"></span>
-            <button onclick="document.getElementById('aiConfigRow').style.display='grid';this.style.display='none'" 
-              style="background:none;border:1px solid var(--border2);color:var(--muted);border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer">
-              키 직접 입력
-            </button>
+            <span id="aiConfigModelLabel" style="font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace">gemini-2.5-flash-preview-04-17</span>
           </div>
         </div>
 
@@ -1278,13 +1259,9 @@ async function runLlmReview() {
     return;
   }
 
-  const apiKey   = (window.GEMINI_CONFIG?.apiKey && window.GEMINI_CONFIG.apiKey !== 'YOUR_API_KEY_HERE')
-                    ? window.GEMINI_CONFIG.apiKey
-                    : document.getElementById('aiApiKey').value.trim();
-  const model    = document.getElementById('aiModel').value.trim() || 'gemini-2.5-flash-preview-04-17';
+  const model    = 'gemini-2.5-flash-preview-04-17';
   const promptTx = document.getElementById('aiPrompt').value.trim();
 
-  if (!apiKey) { alert('Gemini API Key가 없습니다.\nconfig.js에 키를 입력하거나 입력 필드에 직접 입력해 주세요.'); return; }
   if (!promptTx) { alert('검수 요청 내용을 입력해 주세요.'); return; }
 
   // ── 프롬프트 조립 ──────────────────────────────────────────────
@@ -1314,15 +1291,14 @@ async function runLlmReview() {
   resultLabel.textContent = 'AI 응답 대기 중...';
   resultEl.textContent = '';
 
-  // ── Gemini API 호출 ───────────────────────────────────────────
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
-
+  // ── /api/gemini 프록시 서버 호출 (API 키는 서버에서 관리) ──────
   let responseText = '';
   try {
-    const res = await fetch(endpoint, {
+    const res = await fetch('/api/gemini', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        model,
         contents: [{ parts: [{ text: fullPrompt }] }],
         generationConfig: {
           temperature: 0.3,
@@ -1331,13 +1307,12 @@ async function runLlmReview() {
       })
     });
 
+    const json = await res.json();
+
     if (!res.ok) {
-      const errJson = await res.json().catch(() => ({}));
-      const msg = errJson?.error?.message || res.statusText;
-      throw new Error(`API 오류 (${res.status}): ${msg}`);
+      throw new Error(json?.error || `서버 오류 (${res.status})`);
     }
 
-    const json = await res.json();
     responseText = json?.candidates?.[0]?.content?.parts?.[0]?.text
       ?? '응답을 파싱하지 못했습니다. DevTools Console을 확인해 주세요.';
 
