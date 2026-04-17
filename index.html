@@ -601,15 +601,6 @@
       </div>
 
       <div class="card">
-        <!-- 서버 연결 상태 표시 -->
-        <div style="margin-bottom:14px">
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-            <span style="background:rgba(52,211,153,0.12);color:var(--green);border:1px solid rgba(52,211,153,0.25);border-radius:5px;padding:4px 12px;font-size:12px;font-weight:600">
-              🔒 API Key 서버에서 관리됨
-            </span>
-            <span id="aiConfigModelLabel" style="font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace">gemini-2.5-flash-preview-04-17</span>
-          </div>
-        </div>
 
         <!-- 요청 프롬프트 -->
         <div class="ai-prompt-area">
@@ -913,40 +904,15 @@ function showLoading(show) {
    ============================================= */
 let currentData = null; // AI 검수에서 사용
 
-/** config.js 로드 여부를 확인하여 AI 섹션 UI 전환 */
-function applyConfigToUI() {
-  const cfg = window.GEMINI_CONFIG;
-  const configRow    = document.getElementById('aiConfigRow');
-  const configLoaded = document.getElementById('aiConfigLoaded');
-  const modelLabel   = document.getElementById('aiConfigModelLabel');
-
-  if (cfg && cfg.apiKey && cfg.apiKey !== 'YOUR_API_KEY_HERE') {
-    // config.js 유효 → 수동 입력 행 숨기고 안내 표시
-    configRow.style.display    = 'none';
-    configLoaded.style.display = 'block';
-    modelLabel.textContent     = cfg.model || 'gemini-2.5-flash-preview-04-17';
-    // 모델명 입력 필드도 동기화
-    document.getElementById('aiModel').value = cfg.model || 'gemini-2.5-flash-preview-04-17';
-  } else {
-    // config.js 없거나 플레이스홀더 → 수동 입력 모드
-    configRow.style.display    = 'grid';
-    configLoaded.style.display = 'none';
-  }
-}
-
 function render(data) {
   currentData = data;
   dropZone.style.display = 'none';
   resultsEl.classList.add('show');
 
-  // Stats
   document.getElementById('st-total').textContent = data.length;
   document.getElementById('aiFilenameCount').textContent = data.length;
-
-  // AI 검수 섹션
   document.getElementById('aiRunBtn').disabled = false;
   document.getElementById('aiResultBox').classList.remove('show');
-  applyConfigToUI(); // config.js 상태 반영
 
   renderFilenames(data);
   renderSizes(data);
