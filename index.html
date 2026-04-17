@@ -333,6 +333,119 @@
       .main   { padding: 20px 16px 60px; }
       .stats-bar { gap: 8px; }
     }
+
+    /* ── AI 검수 섹션 스타일 ── */
+    .ai-section-wrap {
+      margin-top: 36px;
+      border-top: 1px solid rgba(108,99,255,0.25);
+      padding-top: 28px;
+    }
+    .ai-section-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 18px;
+    }
+    .ai-section-badge {
+      background: linear-gradient(135deg, #6c63ff, #a78bfa);
+      color: #fff; font-size: 11px; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px;
+    }
+    .ai-section-title { font-size: 16px; font-weight: 700; }
+    .ai-section-sub   { font-size: 12px; color: var(--muted); }
+
+    .ai-config {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;
+    }
+    .ai-config-item { display: flex; flex-direction: column; gap: 6px; }
+    .ai-label {
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .ai-input {
+      background: var(--card2); border: 1px solid var(--border2);
+      border-radius: var(--radius-sm); color: var(--text);
+      padding: 8px 12px; font-size: 13px; font-family: 'JetBrains Mono', monospace;
+      transition: border-color 0.2s;
+    }
+    .ai-input:focus { outline: none; border-color: var(--accent); }
+    .ai-input::placeholder { color: var(--muted); opacity: 0.6; }
+
+    .ai-prompt-area {
+      margin-bottom: 12px;
+    }
+    .ai-textarea {
+      width: 100%; min-height: 100px; resize: vertical;
+      background: var(--card2); border: 1px solid var(--border2);
+      border-radius: var(--radius-sm); color: var(--text);
+      padding: 12px 14px; font-size: 13px; font-family: 'Inter', sans-serif;
+      line-height: 1.6; transition: border-color 0.2s;
+    }
+    .ai-textarea:focus { outline: none; border-color: var(--accent); }
+    .ai-textarea::placeholder { color: var(--muted); opacity: 0.6; }
+
+    .ai-file-row {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .ai-file-label {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--card2); border: 1px solid var(--border2);
+      border-radius: var(--radius-sm); padding: 8px 16px;
+      font-size: 13px; cursor: pointer; transition: all 0.2s;
+      color: var(--text);
+    }
+    .ai-file-label:hover { border-color: var(--accent2); color: var(--accent2); }
+    .ai-file-name {
+      font-size: 12px; font-family: 'JetBrains Mono', monospace;
+      color: var(--green); flex: 1;
+    }
+    .ai-file-clear {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 14px; padding: 2px 6px;
+      border-radius: 4px; transition: color 0.2s;
+    }
+    .ai-file-clear:hover { color: var(--red); }
+
+    .ai-run-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, #6c63ff, #a78bfa);
+      color: #fff; border: none; border-radius: var(--radius-sm);
+      padding: 11px 26px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s ease;
+      box-shadow: 0 4px 18px rgba(108,99,255,0.35);
+    }
+    .ai-run-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(108,99,255,0.5); }
+    .ai-run-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .ai-result-box {
+      margin-top: 18px; display: none;
+      background: var(--card2); border: 1px solid var(--border2);
+      border-radius: var(--radius); padding: 20px 22px;
+    }
+    .ai-result-box.show { display: block; }
+    .ai-result-header {
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .ai-result-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+      animation: pulse-dot 1.5s infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+    }
+    .ai-result-dot.done { animation: none; }
+    .ai-result-content {
+      font-size: 13px; line-height: 1.8; color: var(--text);
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .ai-result-content strong { color: var(--accent2); }
+    .ai-spinning {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.8s linear infinite; vertical-align: middle;
+    }
+    @media (max-width: 700px) { .ai-config { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -474,6 +587,66 @@
             </thead>
             <tbody id="ext-tbody"></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- (5) AI 검수 -->
+    <div class="ai-section-wrap" id="sec5">
+      <div class="ai-section-header">
+        <div class="section-num" style="background:linear-gradient(135deg,#6c63ff,#a78bfa)">5</div>
+        <div class="ai-section-title">AI 검수</div>
+        <span class="ai-section-badge">✨ Gemini</span>
+        <span class="ai-section-sub">LLM을 활용한 파일명 추가 검수</span>
+      </div>
+
+      <div class="card">
+        <!-- API 키 + 모델 -->
+        <div class="ai-config">
+          <div class="ai-config-item">
+            <label class="ai-label" for="aiApiKey">🔑 Gemini API Key</label>
+            <input type="password" id="aiApiKey" class="ai-input"
+              placeholder="AIza... 또는 AQ... API 키를 입력하세요" />
+          </div>
+          <div class="ai-config-item">
+            <label class="ai-label" for="aiModel">🤖 모델</label>
+            <input type="text" id="aiModel" class="ai-input"
+              value="gemini-2.0-flash" placeholder="gemini-2.0-flash" />
+          </div>
+        </div>
+
+        <!-- 요청 프롬프트 -->
+        <div class="ai-prompt-area">
+          <label class="ai-label" style="display:block;margin-bottom:6px">💬 검수 요청 내용</label>
+          <textarea id="aiPrompt" class="ai-textarea"
+            placeholder="예시) 아래 분석된 파일 목록과 체크리스트(JSON/TXT)를 비교하여, 누락된 파일명이 있는지, 오타나 스펙 불일치가 있는지 한국어로 결과를 알려주세요."></textarea>
+        </div>
+
+        <!-- 체크리스트 파일 -->
+        <div class="ai-file-row">
+          <label class="ai-file-label" for="aiRefFile">
+            📎 체크리스트 파일 체택
+          </label>
+          <input type="file" id="aiRefFile" accept=".txt,.json,.csv,.md" style="display:none" />
+          <span class="ai-file-name" id="aiFileName">선택된 파일 없음</span>
+          <button class="ai-file-clear" id="aiFileClear" title="파일 해제">✕</button>
+        </div>
+
+        <!-- 실행 -->
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <button class="ai-run-btn" id="aiRunBtn">
+            ✨ AI 검수 시작
+          </button>
+          <span style="font-size:12px;color:var(--muted)">원스 파일명 <span id="aiFilenameCount" style="color:var(--accent2)">0</span>개를 AI에 전달합니다</span>
+        </div>
+
+        <!-- 결과 -->
+        <div class="ai-result-box" id="aiResultBox">
+          <div class="ai-result-header">
+            <span class="ai-result-dot" id="aiResultDot"></span>
+            <span id="aiResultLabel">AI 응답</span>
+          </div>
+          <div class="ai-result-content" id="aiResultContent"></div>
         </div>
       </div>
     </div>
@@ -742,12 +915,20 @@ function showLoading(show) {
 /* =============================================
    렌더링
    ============================================= */
+let currentData = null; // AI 검수에서 사용
+
 function render(data) {
+  currentData = data;
   dropZone.style.display = 'none';
   resultsEl.classList.add('show');
 
   // Stats
   document.getElementById('st-total').textContent = data.length;
+  document.getElementById('aiFilenameCount').textContent = data.length;
+
+  // AI 검수 섹션 사용가능 상태로
+  document.getElementById('aiRunBtn').disabled = false;
+  document.getElementById('aiResultBox').classList.remove('show');
 
   renderFilenames(data);
   renderSizes(data);
@@ -1018,9 +1199,145 @@ function escHtml(str) {
 }
 
 function resetAll() {
+  currentData = null;
   dropZone.style.display = '';
   resultsEl.classList.remove('show');
   fileInput.value = '';
+  // AI 섹션 초기화
+  document.getElementById('aiResultBox').classList.remove('show');
+  document.getElementById('aiResultContent').innerHTML = '';
+  document.getElementById('aiFileName').textContent = '선택된 파일 없음';
+  document.getElementById('aiRefFile').value = '';
+  aiRefFileData = null;
+}
+
+/* =============================================
+   AI 검수 섹션 로직
+   ============================================= */
+let aiRefFileData = null; // { name, content }
+
+// 파일 선택
+document.getElementById('aiRefFile').addEventListener('change', async e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const text = await f.text();
+  aiRefFileData = { name: f.name, content: text };
+  document.getElementById('aiFileName').textContent = f.name;
+});
+
+// 파일 해제
+document.getElementById('aiFileClear').addEventListener('click', () => {
+  aiRefFileData = null;
+  document.getElementById('aiRefFile').value = '';
+  document.getElementById('aiFileName').textContent = '선택된 파일 없음';
+});
+
+// AI 검수 실행
+document.getElementById('aiRunBtn').addEventListener('click', runLlmReview);
+
+async function runLlmReview() {
+  if (!currentData || currentData.length === 0) {
+    alert('먼저 ZIP 파일을 분석해 주세요.');
+    return;
+  }
+
+  const apiKey   = document.getElementById('aiApiKey').value.trim();
+  const model    = document.getElementById('aiModel').value.trim() || 'gemini-2.0-flash';
+  const promptTx = document.getElementById('aiPrompt').value.trim();
+
+  if (!apiKey) { alert('Gemini API Key를 입력해 주세요.'); return; }
+  if (!promptTx) { alert('검수 요청 내용을 입력해 주세요.'); return; }
+
+  // ── 프롬프트 조립 ──────────────────────────────────────────────
+  const filenameList = currentData.map(d => d.name).join('\n');
+
+  let fullPrompt = `당신은 이미지 파일명 검수 전문가입니다.\n\n`;
+  fullPrompt += `## 검수 요청\n${promptTx}\n\n`;
+  fullPrompt += `## 분석된 이미지 파일 목록 (총 ${currentData.length}개)\n\`\`\`\n${filenameList}\n\`\`\`\n`;
+
+  if (aiRefFileData) {
+    fullPrompt += `\n## 체크리스트 파일: ${escHtml(aiRefFileData.name)}\n\`\`\`\n${aiRefFileData.content}\n\`\`\`\n`;
+  } else {
+    fullPrompt += `\n(체크리스트 파일 없음 — 파일 목록만 기준으로 검수)\n`;
+  }
+
+  // ── UI 상태: 로딩 ─────────────────────────────────────────────
+  const runBtn      = document.getElementById('aiRunBtn');
+  const resultBox   = document.getElementById('aiResultBox');
+  const resultDot   = document.getElementById('aiResultDot');
+  const resultLabel = document.getElementById('aiResultLabel');
+  const resultEl    = document.getElementById('aiResultContent');
+
+  runBtn.disabled = true;
+  runBtn.innerHTML = '<span class="ai-spinning"></span> 분석 중...';
+  resultBox.classList.add('show');
+  resultDot.classList.remove('done');
+  resultLabel.textContent = 'AI 응답 대기 중...';
+  resultEl.textContent = '';
+
+  // ── Gemini API 호출 ───────────────────────────────────────────
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+  let responseText = '';
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: fullPrompt }] }],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 8192,
+        }
+      })
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      const msg = errJson?.error?.message || res.statusText;
+      throw new Error(`API 오류 (${res.status}): ${msg}`);
+    }
+
+    const json = await res.json();
+    responseText = json?.candidates?.[0]?.content?.parts?.[0]?.text
+      ?? '응답을 파싱하지 못했습니다. DevTools Console을 확인해 주세요.';
+
+  } catch(err) {
+    responseText = `❌ 오류 발생\n${err.message}`;
+    console.error('[AI 검수 오류]', err);
+  }
+
+  // ── 결과 표시 ─────────────────────────────────────────────────
+  renderLlmResult(resultEl, responseText);
+  resultDot.classList.add('done');
+  resultLabel.textContent = `AI 응답 완료 — ${model}`;
+  runBtn.disabled = false;
+  runBtn.innerHTML = '✨ AI 검수 시작';
+
+  // 결과 영역으로 스크롤
+  resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/** 마크다운 간이 렌더링 (bold, 코드블록, 불릿) */
+function renderLlmResult(el, text) {
+  // 마크다운을 HTML로 간이 변환
+  let html = escHtml(text)
+    // 코드블록 ```...```
+    .replace(/```[\w]*\n?([\s\S]*?)```/g, '<pre style="background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:6px;overflow-x:auto;margin:8px 0;font-family:\'JetBrains Mono\',monospace;font-size:12px">$1</pre>')
+    // 인라인 코드 `...`
+    .replace(/`([^`]+)`/g, '<code style="background:rgba(108,99,255,0.2);padding:1px 6px;border-radius:4px;font-family:\'JetBrains Mono\',monospace;font-size:12px">$1</code>')
+    // **bold**
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--accent2)">$1</strong>')
+    // ## 헤딩
+    .replace(/^## (.+)$/gm, '<div style="font-size:15px;font-weight:700;color:var(--text);margin:14px 0 6px">$1</div>')
+    // # 헤딩
+    .replace(/^# (.+)$/gm, '<div style="font-size:17px;font-weight:800;color:var(--accent2);margin:16px 0 8px">$1</div>')
+    // 불릿
+    .replace(/^[-•*] (.+)$/gm, '<div style="padding-left:16px;margin:2px 0">• $1</div>')
+    // 줄바꿈
+    .replace(/\n/g, '<br>');
+
+  el.innerHTML = html;
 }
 </script>
 </body>
