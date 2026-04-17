@@ -8,5 +8,5 @@
 // ================================================================
 const GEMINI_CONFIG = {
   apiKey: 'YOUR_API_KEY_HERE',          // ← Gemini API 키
-  model:  'gemini-2.5-flash-preview',
+  model:  'gemini-3-flash-preview',
 };

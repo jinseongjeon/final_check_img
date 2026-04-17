@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const { model = 'gemini-2.5-flash-preview', contents, generationConfig } = req.body;
+  const { model = 'gemini-3-flash-preview', contents, generationConfig } = req.body;
 
   try {
     const geminiRes = await fetch(
